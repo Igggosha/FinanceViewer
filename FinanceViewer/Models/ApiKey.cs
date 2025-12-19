@@ -1,9 +1,14 @@
+
 using Microsoft.AspNetCore.Identity;
 
 namespace FinanceViewer.Models;
 
+
+
 public class ApiKey
 {
+    
+    
     public int Id { get; set; }
 
     public string KeyHash { get; set; } = null!;
