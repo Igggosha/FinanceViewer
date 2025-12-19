@@ -11,6 +11,7 @@ builder.Services.AddControllersWithViews();
 var app = builder.Build();
 
 builder.Services.AddDbContext<FinDbContext>(options =>
+        // options.UseSqlite()
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
     );
 
