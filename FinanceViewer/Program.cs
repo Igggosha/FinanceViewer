@@ -8,19 +8,23 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-var app = builder.Build();
-
-builder.Services.AddDbContext<FinDbContext>(options =>
-        // options.UseSqlite()
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
-    );
-
 builder.Services
     .AddIdentity<IdentityUser, IdentityRole>()
     .AddEntityFrameworkStores<FinDbContext>()
     .AddDefaultTokenProviders();
 
-app.UseAuthentication();
+builder.Services.AddDbContext<FinDbContext>(options =>
+    // options.UseSqlite()
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"))
+);
+
+var app = builder.Build();
+
+
+
+
+
+
 
 
 // Configure the HTTP request pipeline.
@@ -31,12 +35,15 @@ if (!app.Environment.IsDevelopment())
     app.UseHsts();
 }
 
+
+
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
 
 app.UseAuthorization();
+app.UseAuthentication();
 
     
 app.MapControllerRoute(
