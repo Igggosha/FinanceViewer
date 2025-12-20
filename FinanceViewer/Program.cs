@@ -28,6 +28,23 @@ builder.Services
         "ApiKey", _ => { });
 
 // builder.WebHost.UseUrls("http://0.0.0.0:5000");
+builder.Configuration.AddEnvironmentVariables();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowFrontend",
+        policy =>
+        {
+            policy
+                .AllowAnyHeader()
+                .AllowAnyMethod()
+                .AllowCredentials()
+                .SetIsOriginAllowed(origin =>
+                    origin.StartsWith("http://localhost") ||
+                    origin.Contains("ngrok")
+                );
+        });
+});
 
 var app = builder.Build();
 

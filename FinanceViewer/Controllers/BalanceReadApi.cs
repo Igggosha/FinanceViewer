@@ -15,8 +15,11 @@ namespace FinanceViewer.Controllers
     {
         private static HttpClient httpClient = new();
         
+        private readonly IConfiguration _configuration;
+        
         // NOT using .env because i dont want to bother
-        private const string ETH_API_KEY = "2N2STTS9NTDC4972WV4NFXUPXFHMX9X9TI"; 
+        private const string ETH_API_KEY = "2N2STTS9NTDC4972WV4NFXUPXFHMX9X9TI";
+        //_configuration["ETH_API_KEY"]; //
         private delegate Task<decimal> fetchFunction(string accountId);
         
         private static Dictionary<string, fetchFunction?> FetchFunctions = new()
@@ -85,14 +88,22 @@ namespace FinanceViewer.Controllers
 
 
         [HttpGet("balance")]
-        async public Task<ActionResult<decimal>> GetBalance(string? address, string? currency)
+        async public Task<ActionResult<object>> GetBalance(string? address, string? currency)
         {
             if (currency != null && address != null && FetchFunctions.ContainsKey(currency.ToUpper()) && FetchFunctions[currency.ToUpper()] != null)
             {
-                return await FetchFunctions[currency.ToUpper()](address);
+                return new
+                {
+                    result = await FetchFunctions[currency.ToUpper()](address)
+                };
             }
 
             return BadRequest();
         }
+
+        // public BalanceReadApi(IConfiguration configuration)
+        // {
+        //     _configuration = configuration;
+        // }
     }
 }
