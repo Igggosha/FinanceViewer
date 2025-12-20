@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Net.Http.Json;
+using System.Text;
 
 namespace FinanceViewer.Controllers
 {
@@ -41,8 +42,44 @@ namespace FinanceViewer.Controllers
                     .GetProperty("result")
                     .GetString());
 
-                return txCount;
+                return txCount / 1_000_000_000_000_000_000;
             },
+            ["SOL"] = async (string address) =>
+            {
+                var rpcUrl = "https://api.mainnet-beta.solana.com";
+
+                using var client = new HttpClient();
+
+                var payload = new
+                {
+                    jsonrpc = "2.0",
+                    id = 1,
+                    method = "getBalance",
+                    @params = new object[]
+                    {
+                        address
+                    }
+                };
+
+                var json = JsonSerializer.Serialize(payload);
+
+                using var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync(rpcUrl, content);
+                response.EnsureSuccessStatusCode();
+
+                var responseJson = await response.Content.ReadAsStringAsync();
+
+                using var doc = JsonDocument.Parse(responseJson);
+
+                // Result is in lamports
+                long lamports = doc.RootElement
+                    .GetProperty("result")
+                    .GetProperty("value")
+                    .GetInt64();
+
+                return lamports / 1_000_000_000m;
+            }
             
         };
 
